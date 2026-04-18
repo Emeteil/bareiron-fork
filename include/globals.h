@@ -16,7 +16,12 @@
 #define false 0
 
 // TCP port, Minecraft's default is 25565
-#define PORT 25565
+#ifndef ESP_PLATFORM
+  extern int cfg_port;
+  #define PORT cfg_port
+#else
+  #define PORT 25565
+#endif
 
 // How many players to keep in memory, NOT the amount of concurrent players
 // Even when offline, players who have logged on before take up a slot
@@ -29,13 +34,28 @@
 #define MOB_DESPAWN_DISTANCE 256
 
 // Server game mode: 0 - survival; 1 - creative; 2 - adventure; 3 - spectator
-#define GAMEMODE 0
+#ifndef ESP_PLATFORM
+  extern int cfg_gamemode;
+  #define GAMEMODE cfg_gamemode
+#else
+  #define GAMEMODE 0
+#endif
 
 // Max render distance, determines how many chunks to send
-#define VIEW_DISTANCE 2
+#ifndef ESP_PLATFORM
+  extern int cfg_view_distance;
+  #define VIEW_DISTANCE cfg_view_distance
+#else
+  #define VIEW_DISTANCE 2
+#endif
 
 // Time between server ticks in microseconds (default = 1s)
-#define TIME_BETWEEN_TICKS 1000000
+#ifndef ESP_PLATFORM
+  extern int64_t cfg_tick_interval;
+  #define TIME_BETWEEN_TICKS cfg_tick_interval
+#else
+  #define TIME_BETWEEN_TICKS 1000000
+#endif
 
 // Calculated from TIME_BETWEEN_TICKS
 #define TICKS_PER_SECOND ((float)1000000 / TIME_BETWEEN_TICKS)
@@ -90,7 +110,12 @@
 // applies only to player data. Block changes are written as soon as they
 // are made, but in much smaller portions. Set DISK_SYNC_BLOCKS_ON_INTERVAL
 // to make this apply to block changes as well.
-#define DISK_SYNC_INTERVAL 15000000
+#ifndef ESP_PLATFORM
+  extern int64_t cfg_disk_sync_interval;
+  #define DISK_SYNC_INTERVAL cfg_disk_sync_interval
+#else
+  #define DISK_SYNC_INTERVAL 15000000
+#endif
 
 // Whether to sync block changes to disk on an interval, instead of syncing
 // on each change. On systems with fast random disk access, this shouldn't
@@ -100,7 +125,12 @@
 // Time in microseconds to spend waiting for data transmission before
 // timing out. Default is 15s, which leaves 5s to prevent starving other
 // clients from Keep Alive packets.
-#define NETWORK_TIMEOUT_TIME 15000000
+#ifndef ESP_PLATFORM
+  extern int64_t cfg_network_timeout;
+  #define NETWORK_TIMEOUT_TIME cfg_network_timeout
+#else
+  #define NETWORK_TIMEOUT_TIME 15000000
+#endif
 
 // Size of the receive buffer for incoming string data
 #define MAX_RECV_BUF_LEN 256

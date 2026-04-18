@@ -37,12 +37,21 @@ uint32_t rng_seed = INITIAL_RNG_SEED;
 uint16_t world_time = 0;
 uint32_t server_ticks = 0;
 
-char motd[] = { "A bareiron server" };
-uint8_t motd_len = sizeof(motd) - 1;
+char motd[256] = "A bareiron server";
+uint8_t motd_len = sizeof("A bareiron server") - 1;
 
 #ifdef SEND_BRAND
   char brand[] = { "bareiron" };
   uint8_t brand_len = sizeof(brand) - 1;
+#endif
+
+#ifndef ESP_PLATFORM
+int cfg_port = 25565;
+int cfg_gamemode = 0;
+int cfg_view_distance = 2;
+int64_t cfg_tick_interval = 1000000;
+int64_t cfg_network_timeout = 15000000;
+int64_t cfg_disk_sync_interval = 15000000;
 #endif
 
 uint16_t client_count;

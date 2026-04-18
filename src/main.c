@@ -496,7 +496,75 @@ void handlePacket (int client_fd, int length, int packet_id, int state) {
 
 }
 
-int main () {
+int main (int argc, char *argv[]) {
+  #ifndef ESP_PLATFORM
+  for (int i = 1; i < argc; i++) {
+    if ((strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)) {
+      printf(
+        "Usage: bareiron [options]\n\n"
+        "Options:\n"
+        "  --port N                TCP port (default: 25565)\n"
+        "  --seed N                World seed before hashing, hex or decimal\n"
+        "  --rng-seed N            RNG seed before hashing, hex or decimal\n"
+        "  --motd TEXT             Server message of the day\n"
+        "  --gamemode N            Game mode: 0=survival, 1=creative, 2=adventure, 3=spectator\n"
+        "  --view-distance N       Render distance in chunks (min 1)\n"
+        "  --tick-interval N       Microseconds between ticks (default: 1000000 = 1s)\n"
+        "  --network-timeout N     Network timeout in microseconds (default: 15000000)\n"
+        "  --disk-sync-interval N  Disk sync interval in microseconds (default: 15000000)\n"
+      );
+      return 0;
+    } else if (strcmp(argv[i], "--port") == 0 && i + 1 < argc) {
+      cfg_port = atoi(argv[++i]);
+      if (cfg_port <= 0 || cfg_port > 65535) {
+        fprintf(stderr, "Invalid port: %s\n", argv[i]);
+        return 1;
+      }
+    } else if (strcmp(argv[i], "--seed") == 0 && i + 1 < argc) {
+      world_seed = (uint32_t)strtoul(argv[++i], NULL, 0);
+    } else if (strcmp(argv[i], "--rng-seed") == 0 && i + 1 < argc) {
+      rng_seed = (uint32_t)strtoul(argv[++i], NULL, 0);
+    } else if (strcmp(argv[i], "--motd") == 0 && i + 1 < argc) {
+      strncpy(motd, argv[++i], 255);
+      motd[255] = '\0';
+      motd_len = (uint8_t)strlen(motd);
+    } else if (strcmp(argv[i], "--gamemode") == 0 && i + 1 < argc) {
+      cfg_gamemode = atoi(argv[++i]);
+      if (cfg_gamemode < 0 || cfg_gamemode > 3) {
+        fprintf(stderr, "Invalid gamemode: %s (must be 0-3)\n", argv[i]);
+        return 1;
+      }
+    } else if (strcmp(argv[i], "--view-distance") == 0 && i + 1 < argc) {
+      cfg_view_distance = atoi(argv[++i]);
+      if (cfg_view_distance < 1) {
+        fprintf(stderr, "Invalid view distance: %s (must be >= 1)\n", argv[i]);
+        return 1;
+      }
+    } else if (strcmp(argv[i], "--tick-interval") == 0 && i + 1 < argc) {
+      cfg_tick_interval = (int64_t)atoll(argv[++i]);
+      if (cfg_tick_interval <= 0) {
+        fprintf(stderr, "Invalid tick interval: %s (must be > 0)\n", argv[i]);
+        return 1;
+      }
+    } else if (strcmp(argv[i], "--network-timeout") == 0 && i + 1 < argc) {
+      cfg_network_timeout = (int64_t)atoll(argv[++i]);
+      if (cfg_network_timeout <= 0) {
+        fprintf(stderr, "Invalid network timeout: %s (must be > 0)\n", argv[i]);
+        return 1;
+      }
+    } else if (strcmp(argv[i], "--disk-sync-interval") == 0 && i + 1 < argc) {
+      cfg_disk_sync_interval = (int64_t)atoll(argv[++i]);
+      if (cfg_disk_sync_interval <= 0) {
+        fprintf(stderr, "Invalid disk sync interval: %s (must be > 0)\n", argv[i]);
+        return 1;
+      }
+    } else {
+      fprintf(stderr, "Unknown argument: %s\nUse --help for usage info\n", argv[i]);
+      return 1;
+    }
+  }
+  #endif
+
   #ifdef _WIN32 //initialize windows socket
     WSADATA wsa;
       if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
